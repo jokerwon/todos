@@ -30,7 +30,7 @@ export default function Page() {
 
   return (
     <main className="mx-auto max-w-4xl space-y-8 px-4 py-10">
-      <header className="space-y-2">
+      <header className="space-y-2" data-testid="welcome">
         <h1 className="text-3xl font-bold">TODO 管理</h1>
         <p className="text-muted-foreground">
           捕获每日任务、按上下文分类，并按时收到提醒。
