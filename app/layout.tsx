@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { AnalyticsProvider } from "./providers/analytics-provider";
+import { SessionProvider } from "./providers/session-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,7 +14,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <body>
         <AnalyticsProvider />
-        {children}
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   );
