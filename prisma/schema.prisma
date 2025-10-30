@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TaskStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+enum ReminderStatus {
+  SCHEDULED
+  SENT
+  MISSED
+  CANCELED
+}
+
+enum ReminderChannel {
+  IN_APP
+  EMAIL
+}
+
+model Task {
+  id                 String          @id @default(uuid())
+  userId             String
+  title              String
+  description        String?
+  status             TaskStatus      @default(ACTIVE)
+  dueDate            DateTime?
+  reminderLeadMinutes Int?
+  completedAt        DateTime?
+  allowPastDue       Boolean         @default(false)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  categories         TaskCategory[]
+  reminders          Reminder[]
+
+  @@index([userId, status])
+  @@index([userId, dueDate])
+}
+
+model Category {
+  id        String         @id @default(uuid())
+  userId    String
+  name      String
+  color     String?
+  icon      String?
+  sortOrder Int?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  tasks     TaskCategory[]
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model TaskCategory {
+  taskId     String
+  categoryId String
+  assignedAt DateTime @default(now())
+
+  task     Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, categoryId])
+}
+
+model Reminder {
+  id            String           @id @default(uuid())
+  taskId        String
+  userId        String
+  triggerAt     DateTime
+  channel       ReminderChannel  @default(IN_APP)
+  status        ReminderStatus   @default(SCHEDULED)
+  lastAttemptAt DateTime?
+  meta          Json?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([triggerAt])
+}

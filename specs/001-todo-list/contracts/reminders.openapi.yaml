@@ -1,0 +1,147 @@
+openapi: 3.1.0
+info:
+  title: TODO Reminder API
+  version: 1.0.0
+  description: Schedule and manage task reminders.
+servers:
+  - url: https://{host}
+    variables:
+      host:
+        default: api.sdd-practice.local
+paths:
+  /api/reminders:
+    get:
+      summary: List reminders for a task or user
+      tags: [Reminders]
+      parameters:
+        - in: query
+          name: taskId
+          schema:
+            type: string
+            format: uuid
+          description: Limit reminders to a specific task.
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [SCHEDULED, SENT, MISSED, CANCELED]
+      responses:
+        '200':
+          description: Reminders returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reminder'
+    post:
+      summary: Schedule a reminder
+      tags: [Reminders]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReminderCreateInput'
+      responses:
+        '201':
+          description: Reminder scheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reminder'
+        '409':
+          description: Reminder limit reached or duplicate channel/time
+  /api/reminders/{reminderId}:
+    parameters:
+      - in: path
+        name: reminderId
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      summary: Update reminder timing or channel
+      tags: [Reminders]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReminderUpdateInput'
+      responses:
+        '200':
+          description: Reminder updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reminder'
+    delete:
+      summary: Cancel reminder
+      tags: [Reminders]
+      responses:
+        '204':
+          description: Reminder canceled
+components:
+  schemas:
+    Reminder:
+      type: object
+      required: [id, taskId, triggerAt, channel, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        taskId:
+          type: string
+          format: uuid
+        triggerAt:
+          type: string
+          format: date-time
+        channel:
+          type: string
+          enum: [IN_APP, EMAIL]
+        status:
+          type: string
+          enum: [SCHEDULED, SENT, MISSED, CANCELED]
+        lastAttemptAt:
+          type: string
+          format: date-time
+          nullable: true
+        meta:
+          type: object
+          additionalProperties: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ReminderCreateInput:
+      type: object
+      required: [taskId, triggerAt]
+      properties:
+        taskId:
+          type: string
+          format: uuid
+        triggerAt:
+          type: string
+          format: date-time
+        channel:
+          type: string
+          enum: [IN_APP, EMAIL]
+          default: IN_APP
+        meta:
+          type: object
+          additionalProperties: true
+    ReminderUpdateInput:
+      type: object
+      properties:
+        triggerAt:
+          type: string
+          format: date-time
+        channel:
+          type: string
+          enum: [IN_APP, EMAIL]
+        status:
+          type: string
+          enum: [SCHEDULED, SENT, MISSED, CANCELED]

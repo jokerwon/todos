@@ -1,0 +1,244 @@
+openapi: 3.1.0
+info:
+  title: TODO Task API
+  version: 1.0.0
+  description: REST endpoints for creating, listing, updating, and deleting user tasks.
+servers:
+  - url: https://{host}
+    variables:
+      host:
+        default: api.sdd-practice.local
+paths:
+  /api/tasks:
+    get:
+      summary: List tasks for the signed-in user
+      tags: [Tasks]
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [ACTIVE, COMPLETED, ARCHIVED]
+          description: Optional status filter.
+        - in: query
+          name: due
+          schema:
+            type: string
+            enum: [today, upcoming, overdue]
+          description: Quick due-date filters mapped to relative ranges.
+        - in: query
+          name: categoryId
+          schema:
+            type: string
+            format: uuid
+          description: Filter tasks assigned to a category.
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Case-insensitive substring match on title/description.
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            minimum: 10
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Task list returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskListResponse'
+    post:
+      summary: Create a new task
+      tags: [Tasks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCreateInput'
+      responses:
+        '201':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /api/tasks/{taskId}:
+    parameters:
+      - in: path
+        name: taskId
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      summary: Update task attributes
+      tags: [Tasks]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskUpdateInput'
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '409':
+          description: Conflict due to optimistic concurrency failure
+    delete:
+      summary: Soft-delete or archive a task
+      tags: [Tasks]
+      responses:
+        '204':
+          description: Task archived
+components:
+  schemas:
+    Task:
+      type: object
+      required: [id, title, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [ACTIVE, COMPLETED, ARCHIVED]
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+        reminderLeadMinutes:
+          type: integer
+          nullable: true
+        categoryIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    TaskCreateInput:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 120
+        description:
+          type: string
+          maxLength: 2000
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+        reminderLeadMinutes:
+          type: integer
+          minimum: 5
+          maximum: 1440
+        categoryIds:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+            format: uuid
+    TaskUpdateInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 120
+        description:
+          type: string
+          maxLength: 2000
+        status:
+          type: string
+          enum: [ACTIVE, COMPLETED, ARCHIVED]
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+        reminderLeadMinutes:
+          type: integer
+          minimum: 5
+          maximum: 1440
+        categoryIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+    TaskListResponse:
+      type: object
+      required: [items, pagination]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+        summary:
+          type: object
+          properties:
+            total:
+              type: integer
+            active:
+              type: integer
+            completed:
+              type: integer
+            overdue:
+              type: integer
+        pagination:
+          type: object
+          required: [page, pageSize, totalPages]
+          properties:
+            page:
+              type: integer
+            pageSize:
+              type: integer
+            totalPages:
+              type: integer
+    ValidationError:
+      type: object
+      required: [message, fields]
+      properties:
+        message:
+          type: string
+        fields:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string

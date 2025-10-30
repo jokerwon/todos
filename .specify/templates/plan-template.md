@@ -31,7 +31,10 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- **Code Quality Excellence**: Confirm the plan enumerates linting, formatting, and static analysis tools that will gate the work, plus any refactors needed to maintain readability.
+- **Test Discipline & Coverage**: Define unit, integration, and contract suites that will be authored before implementation, including ownership for automation and CI integration.
+- **Consistent User Experience**: Capture the design system reference, accessibility acceptance criteria (WCAG 2.1 AA), and product/design reviewers who will sign off.
+- **Performance Stewardship**: Establish latency, throughput, and resource budgets with instrumentation or profiling strategy to verify them within the delivery timeline.
 
 ## Project Structure
 

@@ -18,6 +18,9 @@
   - Tested independently
   - Deployed independently
   - Demonstrated to users independently
+  
+  For each story capture the design system components it reuses, accessibility expectations (WCAG 2.1 AA),
+  and the performance budget the experience must respect.
 -->
 
 ### User Story 1 - [Brief Title] (Priority: P1)
@@ -27,6 +30,10 @@
 **Why this priority**: [Explain the value and why it has this priority level]
 
 **Independent Test**: [Describe how this can be tested independently - e.g., "Can be fully tested by [specific action] and delivers [specific value]"]
+
+**UX Consistency**: [List design system components, copy standards, and accessibility criteria that apply]
+
+**Performance Budget**: [Define measurable targets, e.g., "p95 latency < 200ms", "memory delta < 20MB"]
 
 **Acceptance Scenarios**:
 
@@ -43,6 +50,10 @@
 
 **Independent Test**: [Describe how this can be tested independently]
 
+**UX Consistency**: [Design system components, accessibility considerations, copy guidelines]
+
+**Performance Budget**: [Measurable targets for latency, throughput, or resource usage]
+
 **Acceptance Scenarios**:
 
 1. **Given** [initial state], **When** [action], **Then** [expected outcome]
@@ -56,6 +67,10 @@
 **Why this priority**: [Explain the value and why it has this priority level]
 
 **Independent Test**: [Describe how this can be tested independently]
+
+**UX Consistency**: [Design system components, accessibility considerations, copy guidelines]
+
+**Performance Budget**: [Measurable targets that maintain experience quality]
 
 **Acceptance Scenarios**:
 
@@ -90,6 +105,14 @@
 - **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
 - **FR-005**: System MUST [behavior, e.g., "log all security events"]
 
+### Quality & Non-Functional Requirements *(mandatory)*
+
+- **QNR-001**: Implementation MUST satisfy repository linting, formatting, and static analysis requirements.
+- **QNR-002**: Automated tests MUST cover the success path, failure modes, and regression cases for this feature.
+- **QNR-003**: Experience MUST reuse approved design system components and meet WCAG 2.1 AA accessibility criteria.
+- **QNR-004**: Feature MUST achieve defined performance budgets (e.g., p95 latency, throughput, memory footprint) with instrumentation to verify them.
+- **QNR-005**: Observability MUST capture metrics and logs needed to monitor the user journey end-to-end.
+
 *Example of marking unclear requirements:*
 
 - **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
@@ -105,6 +128,7 @@
 <!--
   ACTION REQUIRED: Define measurable success criteria.
   These must be technology-agnostic and measurable.
+  Ensure outcomes confirm code quality gates, automated testing coverage, UX consistency, and performance targets.
 -->
 
 ### Measurable Outcomes

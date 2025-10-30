@@ -1,0 +1,130 @@
+openapi: 3.1.0
+info:
+  title: TODO Category API
+  version: 1.0.0
+  description: Manage user-defined task categories.
+servers:
+  - url: https://{host}
+    variables:
+      host:
+        default: api.sdd-practice.local
+paths:
+  /api/categories:
+    get:
+      summary: List categories belonging to the current user
+      tags: [Categories]
+      responses:
+        '200':
+          description: Categories returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+    post:
+      summary: Create a category
+      tags: [Categories]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryCreateInput'
+      responses:
+        '201':
+          description: Category created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '409':
+          description: Duplicate category name
+  /api/categories/{categoryId}:
+    parameters:
+      - in: path
+        name: categoryId
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      summary: Update category metadata
+      tags: [Categories]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryUpdateInput'
+      responses:
+        '200':
+          description: Category updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+    delete:
+      summary: Delete category and detach from tasks
+      tags: [Categories]
+      responses:
+        '204':
+          description: Category deleted
+components:
+  schemas:
+    Category:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 60
+        color:
+          type: string
+          nullable: true
+          pattern: '^#?[A-Fa-f0-9]{6}$'
+        icon:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CategoryCreateInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 60
+        color:
+          type: string
+          nullable: true
+        icon:
+          type: string
+          nullable: true
+    CategoryUpdateInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 60
+        color:
+          type: string
+          nullable: true
+        icon:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
+          nullable: true
